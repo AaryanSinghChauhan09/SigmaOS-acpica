@@ -3,7 +3,7 @@ name = "SigmaOS-acpica"
 tier = 2
 stability = "scaffold"
 language = "rust"
-description = "acpica component"
+description = "SigmaOS component repository"
 upstream = []
 
 [contract]
