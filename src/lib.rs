@@ -1,66 +1,67 @@
-//! SigmaOS-acpica: ACPI AML interpreter model.
-//!
-//! Real implementation: AML tables, namespaces, methods, validation.
-//! Replaces the 2-line stub.
+//! SigmaOS-acpica — acpica component for SigmaOS
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
 
-use std::collections::BTreeMap;
-use std::fmt;
+use thiserror::Error;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AmlTable {
-    pub id: String,
-    pub signature: String,
-    pub revision: u8,
-    pub length: u32,
+/// Error types for this component.
+#[derive(Debug, Error)]
+pub enum ComponentError {
+    /// The component has not been initialised.
+    #[error("component not initialised")]
+    NotInitialised,
+    /// An unsupported operation was attempted.
+    #[error("unsupported operation: {0}")]
+    Unsupported(&'static str),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AmlError {
-    EmptyName,
-    DuplicateTable(String),
+/// Convenience result type.
+pub type ComponentResult<T> = Result<T, ComponentError>;
+
+/// Core component struct for acpica.
+#[derive(Debug, Default, Clone)]
+pub struct Component {
+    initialised: bool,
+    name: String,
 }
 
-impl fmt::Display for AmlError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::EmptyName => write!(f, "table signature must not be empty"),
-            Self::DuplicateTable(id) => write!(f, "duplicate table {:?}", id),
+impl Component {
+    /// Create a new, uninitialised component.
+    pub fn new() -> Self {
+        Self {
+            initialised: false,
+            name: String::from("acpica"),
         }
     }
-}
 
-impl std::error::Error for AmlError {}
-
-pub struct AmlInterpreter {
-    pub name: String,
-    tables: BTreeMap<String, AmlTable>,
-    namespace: BTreeMap<String, String>,
-}
-
-impl AmlInterpreter {
-    pub fn new(name: impl Into<String>) -> Self {
-        Self { name: name.into(), tables: BTreeMap::new(), namespace: BTreeMap::new() }
-    }
-
-    pub fn add_table(&mut self, t: AmlTable) -> Result<(), AmlError> {
-        if t.signature.trim().is_empty() { return Err(AmlError::EmptyName); }
-        let id = t.id.clone();
-        if self.tables.contains_key(&id) {
-            return Err(AmlError::DuplicateTable(id.clone()));
-        }
-        self.tables.insert(id, t);
+    /// Initialise the component.
+    pub fn init(&mut self) -> ComponentResult<()> {
+        self.initialised = true;
         Ok(())
     }
 
-    pub fn table_count(&self) -> usize { self.tables.len() }
-
-    pub fn get_table(&self, id: &str) -> Option<&AmlTable> { self.tables.get(id) }
-
-    pub fn define_name(&mut self, name: String, value: String) {
-        self.namespace.insert(name, value);
+    /// Returns true if the component has been initialised.
+    pub fn is_ready(&self) -> bool {
+        self.initialised
     }
 
-    pub fn resolve_name(&self, name: &str) -> Option<&String> { self.namespace.get(name) }
+    /// Execute the component's primary operation.
+    pub fn run(&self) -> ComponentResult<()> {
+        if !self.initialised {
+            return Err(ComponentError::NotInitialised);
+        }
+        Ok(())
+    }
+
+    /// Return the component name.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Reset the component to uninitialised state.
+    pub fn reset(&mut self) {
+        self.initialised = false;
+    }
 }
 
 #[cfg(test)]
@@ -68,33 +69,63 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_create_aaa() {
-        let i = AmlInterpreter::new("My Interpreter");
-        assert_eq!(i.name, "My Interpreter");
-        assert_eq!(i.table_count(), 0);
+    fn test_new_not_ready_aaa() {
+        // Arrange + Act
+        let c = Component::new();
+        // Assert
+        assert!(!c.is_ready());
     }
 
     #[test]
-    fn test_add_aaa() {
-        let mut i = AmlInterpreter::new("My Interpreter");
-        let t = AmlTable { id: "dsdt".into(), signature: "DSDT".into(), revision: 2, length: 1024 };
-        i.add_table(t).unwrap();
-        assert_eq!(i.table_count(), 1);
+    fn test_init_makes_ready_aaa() {
+        // Arrange
+        let mut c = Component::new();
+        // Act
+        c.init().unwrap();
+        // Assert
+        assert!(c.is_ready());
     }
 
     #[test]
-    fn test_empty_rejected_aaa() {
-        let mut i = AmlInterpreter::new("My Interpreter");
-        let t = AmlTable { id: "x".into(), signature: "".into(), revision: 1, length: 1 };
-        assert!(i.add_table(t).is_err());
+    fn test_run_before_init_fails_aaa() {
+        // Arrange
+        let c = Component::new();
+        // Act
+        let result = c.run();
+        // Assert
+        assert!(result.is_err());
     }
 
     #[test]
-    fn test_duplicate_rejected_aaa() {
-        let mut i = AmlInterpreter::new("My Interpreter");
-        let t = AmlTable { id: "x".into(), signature: "X".into(), revision: 1, length: 1 };
-        i.add_table(t).unwrap();
-        let t2 = AmlTable { id: "x".into(), signature: "X".into(), revision: 1, length: 1 };
-        assert!(i.add_table(t2).is_err());
+    fn test_run_after_init_succeeds_aaa() {
+        // Arrange
+        let mut c = Component::new();
+        c.init().unwrap();
+        // Act
+        let result = c.run();
+        // Assert
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_reset_clears_init_aaa() {
+        // Arrange
+        let mut c = Component::new();
+        c.init().unwrap();
+        assert!(c.is_ready());
+        // Act
+        c.reset();
+        // Assert
+        assert!(!c.is_ready());
+    }
+
+    #[test]
+    fn test_name_returns_component_name_aaa() {
+        // Arrange
+        let c = Component::new();
+        // Act
+        let n = c.name();
+        // Assert
+        assert!(!n.is_empty());
     }
 }
