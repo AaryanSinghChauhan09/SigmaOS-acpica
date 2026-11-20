@@ -1,64 +1,50 @@
-# SigmaOS-acpica Component Wiki
+# SigmaOS-SigmaOS-acpica Component Wiki
 
 ## Overview
-SigmaOS-acpica provides ACPI Component Architecture (ACPI) support for the SigmaOS operating system. It demonstrates the ACPI subsystem and table parsing capabilities within the SigmaOS ecosystem, following the principles of minimal kernel design and deterministic initialization.
+SigmaOS-SigmaOS-acpica provides SigmaOS component repository for the SigmaOS operating system. It demonstrates the subsystem and integration within the SigmaOS ecosystem, following the principles of clear abstraction and deterministic initialization.
 
 ## Principles
 - Single Responsibility
-- ACPI Abstraction
-- Fail-Fast on ACPI Initialization Errors
-- Deterministic ACPI Setup
-- Clear Abstraction Over ACPI APIs
-- Composition over Inheritance for ACPI implementations
+- SigmaOS-acpica Abstraction
+- Fail-Fast on SigmaOS-acpica Initialization Errors
+- Deterministic SigmaOS-acpica Setup
+- Clear Abstraction Over SigmaOS-acpica APIs
+- Composition over Inheritance for SigmaOS-acpica extensions
 
 ## Architecture
-SigmaOS-acpica follows an ACPI pattern:
-- **ACPI Core**: Provides ACPI table parsing, DSDT, and SSDT extraction primitives
-- **Hardware Abstraction**: Abstracts hardware-specific ACPI operations for power management and device control
-- **Intermediate Language**: Supports ACPI Bytecode execution and namespace traversal
-- **Error Handling**: Fail-fast on invalid ACPI tables or unsupported configurations
+SigmaOS-SigmaOS-acpica follows a SigmaOS-acpica pattern:
+- **SigmaOS-acpica Core**: Provides SigmaOS-acpica support, SigmaOS-acpica management, and SigmaOS-acpica tracking
+- **Management**: Supports SigmaOS-acpica management, SigmaOS-acpica configuration, and SigmaOS-acpica lifecycle
+- **Tracking**: Supports SigmaOS-acpica status, SigmaOS-acpica tracking, and SigmaOS-acpica lifecycle
+- **Error Handling**: Fail-fast on invalid SigmaOS-acpica configurations or unsupported SigmaOS-acpica types
 
 ## API
 The component provides the following public APIs:
-- `acpi::table::parse(data)` - Parse raw ACPI table data
-- `acpi::dsdt::extract()` - Extract Differentiated System Description Table
-- `acpi::ssdt::extract()` - Extract Secondary System Description Table
-- `acpi::status()` - Get ACPI subsystem status and error information
-- Error types for ACPI parsing failures or unsupported table versions
+-  - Manage a SigmaOS-acpica by given configuration
+-  - Register a SigmaOS-acpica by given name
+-  - Get SigmaOS-acpica status and SigmaOS-acpica availability
+-  - Track SigmaOS-acpica management and SigmaOS-acpica tracking
+- Error types for SigmaOS-acpica failure scenarios or unsupported SigmaOS-acpica types
 
 ## Test Structure (Arrange-Act-ASSERT)
 All tests follow the AAA pattern:
-1. **Arrange**: Set up test environment with specific ACPI configuration
-2. **Act**: Execute the code under test (ACPI table parsing, extraction)
-3. **Assert**: Verify the expected ACPI results
+1. **Arrange**: Set up test environment with specific SigmaOS-acpica configuration
+2. **Act**: Execute the code under test (SigmaOS-acpica init, SigmaOS-acpica management)
+3. **Assert**: Verify the expected SigmaOS-acpica results
 
 Example:
-```rust
-#[test]
-fn test_acpi_table_parse_aaa() {
-    // Arrange
-    let raw_data = include_bytes!("../test-data/test-acpi.bin");
-    
-    // Act
-    let result = acpi::table::parse(raw_data);
-    
-    // Assert
-    assert!(result.is_ok());
-    let table = result.unwrap();
-    assert!(table.is_valid());
-}
-```
+
 
 ## Development
-- Follows Rust best practices with `#![forbid(unsafe_code)]`
-- ACPI initialization is best-effort; gracefully degrades on invalid tables or unsupported hardware
-- Comprehensive error types for all ACPI failure scenarios
-- Unit tests provided for table parsing and extraction
-- Integration tests for full ACPI with real system firmware
+- Follows Rust best practices with 
+- SigmaOS-acpica initialization is best-effort; gracefully degrades on unsupported configurations
+- Comprehensive error types for all SigmaOS-acpica failure scenarios
+- Unit tests provided for SigmaOS-acpica management and configuration
+- Integration tests for full SigmaOS-acpica system with actual SigmaOS-acpica integration
 
 ## TODO
-- Add support for additional ACPI table versions and types
-- Expand DSDT/SSDT extraction capabilities (power management, device probing)
-- Add ACPI namespace traversal and method execution features
-- Create integration tests with real system firmware
-- Implement ACPI event handling and notification support
+- Add support for additional SigmaOS-acpica types
+- Expand SigmaOS-acpica capabilities (SigmaOS-acpica features, SigmaOS-acpica configurations, SigmaOS-acpica tracking)
+- Add lifecycle features (SigmaOS-acpica tracking, SigmaOS-acpica lifecycle, SigmaOS-acpica propagation)
+- Create integration tests with actual SigmaOS-acpica systems and SigmaOS-acpica integration
+- Implement SigmaOS-acpica persistence and SigmaOS-acpica state management
